@@ -31,10 +31,10 @@ export default function DashboardPage() {
   }
 
   const games = [
-    { id: 'memory-match', name: 'Memory Match', description: 'Test your memory skills' },
-    { id: 'quick-math', name: 'Quick Math', description: 'Solve math problems fast' },
-    { id: 'word-puzzle', name: 'Word Puzzle', description: 'Unscramble the words' },
-    { id: 'reaction-time', name: 'Reaction Time', description: 'Test your reflexes' }
+    { id: 'memory-match', name: 'Memory Match', description: 'Test your memory skills', key: 'memoryMatch' as const },
+    { id: 'quick-math', name: 'Quick Math', description: 'Solve math problems fast', key: 'quickMath' as const },
+    { id: 'word-puzzle', name: 'Word Puzzle', description: 'Unscramble the words', key: 'wordPuzzle' as const },
+    { id: 'reaction-time', name: 'Reaction Time', description: 'Test your reflexes', key: 'reactionTime' as const }
   ];
 
   return (
@@ -48,7 +48,7 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <Link href="/ranking" className="text-gray-700 hover:text-gray-900">Rankings</Link>
               <Link href="/profile" className="text-gray-700 hover:text-gray-900">Profile</Link>
-              <span className="text-gray-700">Welcome, {user.displayName}</span>
+              <span className="text-gray-700">Welcome, {user.userName}</span>
             </div>
           </div>
         </div>
@@ -61,21 +61,27 @@ export default function DashboardPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900">Games Played</h3>
-                <p className="text-3xl font-bold text-blue-600">{user.totalGamesPlayed}</p>
+                <h3 className="text-lg font-medium text-gray-900">Memory Match</h3>
+                <p className="text-3xl font-bold text-blue-600">{user.gameScores.memoryMatch}</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900">Total Score</h3>
-                <p className="text-3xl font-bold text-green-600">{user.totalScore}</p>
+                <h3 className="text-lg font-medium text-gray-900">Quick Math</h3>
+                <p className="text-3xl font-bold text-green-600">{user.gameScores.quickMath}</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900">Rating</h3>
-                <p className="text-3xl font-bold text-purple-600">{user.rating}</p>
+                <h3 className="text-lg font-medium text-gray-900">Word Puzzle</h3>
+                <p className="text-3xl font-bold text-purple-600">{user.gameScores.wordPuzzle}</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900">Rank</h3>
-                <p className="text-3xl font-bold text-orange-600">#{user.rank || 'N/A'}</p>
+                <h3 className="text-lg font-medium text-gray-900">Reaction Time</h3>
+                <p className="text-3xl font-bold text-orange-600">{user.gameScores.reactionTime}</p>
               </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow mb-8">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Total Rating</h3>
+              <p className="text-4xl font-bold text-indigo-600">{user.totalRating}</p>
+              <p className="text-sm text-gray-500">Rank: #{user.rank || 'N/A'}</p>
             </div>
           </div>
 
@@ -89,7 +95,8 @@ export default function DashboardPage() {
                   className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow"
                 >
                   <h4 className="text-xl font-semibold text-gray-900 mb-2">{game.name}</h4>
-                  <p className="text-gray-600">{game.description}</p>
+                  <p className="text-gray-600 mb-2">{game.description}</p>
+                  <p className="text-sm text-gray-500 mb-4">Best Score: {user.gameScores[game.key]}</p>
                   <div className="mt-4">
                     <span className="text-blue-600 font-medium">Play Now →</span>
                   </div>

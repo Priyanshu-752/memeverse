@@ -3,11 +3,28 @@ import { Timestamp } from 'firebase/firestore';
 export interface User {
   uid: string;
   email: string;
-  displayName: string;
+  userName: string;
   createdAt: Timestamp;
-  totalGamesPlayed: number;
-  totalScore: number;
-  rating: number;
+  gameScores: {
+    memoryMatch: number;
+    quickMath: number;
+    wordPuzzle: number;
+    reactionTime: number;
+  };
+  totalRating: number;
+  rank: number;
+}
+
+export interface UserRanking {
+  uid: string;
+  userName: string;
+  totalRating: number;
+  gameScores: {
+    memoryMatch: number;
+    quickMath: number;
+    wordPuzzle: number;
+    reactionTime: number;
+  };
   rank: number;
 }
 

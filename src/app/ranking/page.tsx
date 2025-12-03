@@ -1,37 +1,43 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { LeaderboardEntry } from '@/types';
+import { getCombinedRanking, getGameRanking } from '@/lib/auth';
+import { UserRanking } from '@/types';
 import Link from 'next/link';
 
 export default function RankingPage() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [rankings, setRankings] = useState<UserRanking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedGame, setSelectedGame] = useState<'combined' | 'memoryMatch' | 'quickMath' | 'wordPuzzle' | 'reactionTime'>('combined');
+
+  const gameOptions = [
+    { key: 'combined' as const, name: 'Combined Ranking' },
+    { key: 'memoryMatch' as const, name: 'Memory Match' },
+    { key: 'quickMath' as const, name: 'Quick Math' },
+    { key: 'wordPuzzle' as const, name: 'Word Puzzle' },
+    { key: 'reactionTime' as const, name: 'Reaction Time' }
+  ];
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
+    const fetchRankings = async () => {
+      setLoading(true);
       try {
-        const q = query(
-          collection(db, 'leaderboard'),
-          orderBy('rating', 'desc'),
-          limit(50)
-        );
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({
-          ...doc.data()
-        })) as LeaderboardEntry[];
-        setLeaderboard(data);
+        let data: UserRanking[];
+        if (selectedGame === 'combined') {
+          data = await getCombinedRanking();
+        } else {
+          data = await getGameRanking(selectedGame);
+        }
+        setRankings(data);
       } catch (error) {
-        console.error('Error fetching leaderboard:', error);
+        console.error('Error fetching rankings:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLeaderboard();
-  }, []);
+    fetchRankings();
+  }, [selectedGame]);
 
   if (loading) {
     return (
@@ -51,7 +57,20 @@ export default function RankingPage() {
         
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Leaderboard</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">Leaderboard</h2>
+              <select
+                value={selectedGame}
+                onChange={(e) => setSelectedGame(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {gameOptions.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           
           <div className="overflow-x-auto">
@@ -65,26 +84,36 @@ export default function RankingPage() {
                     Player
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rating
+                    {selectedGame === 'combined' ? 'Total Rating' : 'Score'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Games Played
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Score
-                  </th>
+                  {selectedGame === 'combined' && (
+                    <>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Memory Match
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Quick Math
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Word Puzzle
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Reaction Time
+                      </th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {leaderboard.length === 0 ? (
+                {rankings.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={selectedGame === 'combined' ? 7 : 3} className="px-6 py-4 text-center text-gray-500">
                       No rankings available yet. Start playing games to appear on the leaderboard!
                     </td>
                   </tr>
                 ) : (
-                  leaderboard.map((entry, index) => (
-                    <tr key={entry.userId} className={index < 3 ? 'bg-yellow-50' : ''}>
+                  rankings.map((entry, index) => (
+                    <tr key={entry.uid} className={index < 3 ? 'bg-yellow-50' : ''}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         #{index + 1}
                       </td>
@@ -92,14 +121,24 @@ export default function RankingPage() {
                         {entry.userName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {entry.rating}
+                        {selectedGame === 'combined' ? entry.totalRating : entry.gameScores[selectedGame]}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {entry.gamesPlayed}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {entry.totalScore}
-                      </td>
+                      {selectedGame === 'combined' && (
+                        <>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {entry.gameScores.memoryMatch}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {entry.gameScores.quickMath}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {entry.gameScores.wordPuzzle}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {entry.gameScores.reactionTime}
+                          </td>
+                        </>
+                      )}
                     </tr>
                   ))
                 )}
