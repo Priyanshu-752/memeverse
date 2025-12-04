@@ -1,11 +1,7 @@
 import { User } from '@/types';
 
 export const calculateRating = (user: User) => {
-  const baseRating = 1000;
-  const gamesBonus = user.totalGamesPlayed * 10;
-  const scoreMultiplier = user.totalGamesPlayed > 0 ? user.totalScore / user.totalGamesPlayed : 0;
-  
-  return Math.round(baseRating + gamesBonus + scoreMultiplier);
+  return user.totalRating;
 };
 
 export const formatDate = (timestamp: any) => {

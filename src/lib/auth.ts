@@ -85,14 +85,14 @@ export const getCombinedRanking = async (): Promise<UserRanking[]> => {
   const querySnapshot = await getDocs(q);
   
   const rankings: UserRanking[] = [];
-  querySnapshot.forEach((doc, index) => {
+  querySnapshot.forEach((doc) => {
     const data = doc.data();
     rankings.push({
       uid: doc.id,
       userName: data.userName,
       totalRating: data.totalRating,
       gameScores: data.gameScores,
-      rank: index + 1
+      rank: rankings.length + 1
     });
   });
   
@@ -105,14 +105,14 @@ export const getGameRanking = async (gameType: keyof User['gameScores']): Promis
   const querySnapshot = await getDocs(q);
   
   const rankings: UserRanking[] = [];
-  querySnapshot.forEach((doc, index) => {
+  querySnapshot.forEach((doc) => {
     const data = doc.data();
     rankings.push({
       uid: doc.id,
       userName: data.userName,
       totalRating: data.totalRating,
       gameScores: data.gameScores,
-      rank: index + 1
+      rank: rankings.length + 1
     });
   });
   

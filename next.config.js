@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
+  turbopack: {
+    root: __dirname,
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -21,9 +21,12 @@ const nextConfig = {
         path: false,
       };
     }
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      undici: false,
+    };
     return config;
   },
-  transpilePackages: ['firebase', '@firebase/auth', '@firebase/firestore'],
 };
 
 module.exports = nextConfig;
