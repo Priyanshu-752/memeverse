@@ -6,7 +6,7 @@ export interface User {
   userName: string;
   createdAt: Timestamp;
   gameScores: {
-    memoryMatch: number;
+    flyingMeme: number;
     quickMath: number;
     wordPuzzle: number;
     reactionTime: number;
@@ -20,7 +20,7 @@ export interface UserRanking {
   userName: string;
   totalRating: number;
   gameScores: {
-    memoryMatch: number;
+    flyingMeme: number;
     quickMath: number;
     wordPuzzle: number;
     reactionTime: number;

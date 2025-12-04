@@ -94,11 +94,11 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
                 <div>
-                  <h4 className="font-medium text-gray-900">Memory Match</h4>
-                  <p className="text-sm text-gray-600">Test your memory skills</p>
+                  <h4 className="font-medium text-gray-900">Flying Meme</h4>
+                  <p className="text-sm text-gray-600">Fly through obstacles</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">{user.gameScores.memoryMatch}</p>
+                  <p className="text-2xl font-bold text-blue-600">{user.gameScores.flyingMeme}</p>
                   <p className="text-xs text-gray-500">Best Score</p>
                 </div>
               </div>

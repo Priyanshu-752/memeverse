@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function GamesPage() {
   const games = [
-    { id: 'memory-match', name: 'Memory Match', description: 'Test your memory skills' },
+    { id: 'flying-meme', name: 'Flying Meme', description: 'Test your flying skills' },
     { id: 'quick-math', name: 'Quick Math', description: 'Solve math problems fast' },
     { id: 'word-puzzle', name: 'Word Puzzle', description: 'Unscramble the words' },
     { id: 'reaction-time', name: 'Reaction Time', description: 'Test your reflexes' }

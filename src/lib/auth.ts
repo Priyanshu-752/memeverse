@@ -29,7 +29,7 @@ export const registerUser = async (email: string, password: string, userName: st
     userName,
     createdAt: Timestamp.now(),
     gameScores: {
-      memoryMatch: 0,
+      flyingMeme: 0,
       quickMath: 0,
       wordPuzzle: 0,
       reactionTime: 0

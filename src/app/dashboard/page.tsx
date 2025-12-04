@@ -31,7 +31,7 @@ export default function DashboardPage() {
   }
 
   const games = [
-    { id: 'memory-match', name: 'Memory Match', description: 'Test your memory skills', key: 'memoryMatch' as const },
+    { id: 'flying-meme', name: 'Flying Meme', description: 'Fly through obstacles', key: 'flyingMeme' as const },
     { id: 'quick-math', name: 'Quick Math', description: 'Solve math problems fast', key: 'quickMath' as const },
     { id: 'word-puzzle', name: 'Word Puzzle', description: 'Unscramble the words', key: 'wordPuzzle' as const },
     { id: 'reaction-time', name: 'Reaction Time', description: 'Test your reflexes', key: 'reactionTime' as const }
@@ -61,8 +61,8 @@ export default function DashboardPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900">Memory Match</h3>
-                <p className="text-3xl font-bold text-blue-600">{user.gameScores.memoryMatch}</p>
+                <h3 className="text-lg font-medium text-gray-900">Flying Meme</h3>
+                <p className="text-3xl font-bold text-blue-600">{user.gameScores.flyingMeme}</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-lg font-medium text-gray-900">Quick Math</h3>

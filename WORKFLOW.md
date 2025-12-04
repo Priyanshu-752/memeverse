@@ -170,7 +170,7 @@ interface LeaderboardEntry {
 - [ ] Results submission
 
 ### 5.2 Game Placeholders (4 Games)
-- [ ] Game 1: Memory Match
+- [ ] Game 1: Flying Meme
 - [ ] Game 2: Quick Math
 - [ ] Game 3: Word Puzzle
 - [ ] Game 4: Reaction Time
@@ -235,7 +235,7 @@ const calculateRating = (user: User) => {
 
 ## Phase 8: Game Development
 
-### 8.1 Game 1: Memory Match
+### 8.1 Game 1: Flying Meme
 - [ ] Card grid layout
 - [ ] Flip animation
 - [ ] Match detection

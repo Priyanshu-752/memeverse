@@ -8,11 +8,11 @@ import Link from 'next/link';
 export default function RankingPage() {
   const [rankings, setRankings] = useState<UserRanking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedGame, setSelectedGame] = useState<'combined' | 'memoryMatch' | 'quickMath' | 'wordPuzzle' | 'reactionTime'>('combined');
+  const [selectedGame, setSelectedGame] = useState<'combined' | 'flyingMeme' | 'quickMath' | 'wordPuzzle' | 'reactionTime'>('combined');
 
   const gameOptions = [
     { key: 'combined' as const, name: 'Combined Ranking' },
-    { key: 'memoryMatch' as const, name: 'Memory Match' },
+    { key: 'flyingMeme' as const, name: 'Flying Meme' },
     { key: 'quickMath' as const, name: 'Quick Math' },
     { key: 'wordPuzzle' as const, name: 'Word Puzzle' },
     { key: 'reactionTime' as const, name: 'Reaction Time' }
@@ -89,7 +89,7 @@ export default function RankingPage() {
                   {selectedGame === 'combined' && (
                     <>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Memory Match
+                        Flying Meme
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Quick Math
@@ -126,7 +126,7 @@ export default function RankingPage() {
                       {selectedGame === 'combined' && (
                         <>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {entry.gameScores.memoryMatch}
+                            {entry.gameScores.flyingMeme}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {entry.gameScores.quickMath}
