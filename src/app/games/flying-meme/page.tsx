@@ -6,7 +6,7 @@ import { updateUserScore } from '@/lib/auth';
 import Link from 'next/link';
 import BachanImage from "public/images/bachan.png";
 import GandiImage from "public/images/gandi.png";
-import ModiImage from "public/images/modi.jpg"
+import ModiImage from "public/images/modi.png"
 
 interface Obstacle {
   x: number;
@@ -254,14 +254,10 @@ export default function FlyingBirdGame() {
 
       // Draw obstacles
       if (selectedTheme === 'gandi' && obstacleImageRef.current && obstacleImageRef.current.complete) {
-        // Draw Modi images for Gandhi theme
-        const imgHeight = 60;
-        for (let y = 0; y < obstacle.y; y += imgHeight) {
-          ctx.drawImage(obstacleImageRef.current, obstacle.x, y, obstacle.width, Math.min(imgHeight, obstacle.y - y));
-        }
-        for (let y = obstacle.y + obstacle.height; y < canvas.height; y += imgHeight) {
-          ctx.drawImage(obstacleImageRef.current, obstacle.x, y, obstacle.width, Math.min(imgHeight, canvas.height - y));
-        }
+        // Draw single Modi image stretched for top obstacle
+        ctx.drawImage(obstacleImageRef.current, obstacle.x, 0, obstacle.width, obstacle.y);
+        // Draw single Modi image stretched for bottom obstacle
+        ctx.drawImage(obstacleImageRef.current, obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
       } else {
         // Draw bricks for Bachan theme
         ctx.fillStyle = '#8B4513';
