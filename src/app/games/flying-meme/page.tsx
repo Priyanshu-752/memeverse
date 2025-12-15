@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { auth } from '@/lib/firebase';
 import { updateUserScore } from '@/lib/auth';
 import Link from 'next/link';
-import DummyImage from "public/images/bachan.png";
+import BachanImage from "public/images/bachan.png";
+import GandiImage from "public/images/gandi.png";
+import ModiImage from "public/images/modi.jpg"
 
 interface Obstacle {
   x: number;
@@ -22,6 +24,8 @@ export default function FlyingBirdGame() {
   const [gameEnded, setGameEnded] = useState(false);
   const [showGameOverDialog, setShowGameOverDialog] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [selectedTheme, setSelectedTheme] = useState<'bachan' | 'gandi' | null>(null);
+  const obstacleImageRef = useRef<HTMLImageElement>();
   const gameLoopRef = useRef<number>();
   const birdImageRef = useRef<HTMLImageElement>();
   const jumpAudioRef = useRef<HTMLAudioElement>();
@@ -38,16 +42,7 @@ export default function FlyingBirdGame() {
       setUser(firebaseUser);
     });
     
-    // Load bird image
-    const img = new Image();
-    img.src = DummyImage.src;
-    birdImageRef.current = img;
-    
-    // Load sounds
-    jumpAudioRef.current = new Audio('/sound/JumpAag.m4a');
-    gameOverAudioRef.current = new Audio('/sound/mkcAag.m4a');
-    introAudioRef.current = new Audio('/sound/intro.m4a');
-    introAudioRef.current.loop = true;
+    // Sounds will be loaded when theme is selected
     
     return () => {
       unsubscribe();
@@ -65,7 +60,53 @@ export default function FlyingBirdGame() {
     };
   }, []);
 
+  const stopAllSounds = () => {
+    if (introAudioRef.current) {
+      introAudioRef.current.pause();
+      introAudioRef.current.currentTime = 0;
+    }
+    if (jumpAudioRef.current) {
+      jumpAudioRef.current.pause();
+      jumpAudioRef.current.currentTime = 0;
+    }
+    if (gameOverAudioRef.current) {
+      gameOverAudioRef.current.pause();
+      gameOverAudioRef.current.currentTime = 0;
+    }
+  };
+
+  const selectTheme = (theme: 'bachan' | 'gandi') => {
+    setSelectedTheme(theme);
+    
+    // Load bird image based on theme
+    const birdImg = new Image();
+    birdImg.src = theme === 'bachan' ? BachanImage.src : GandiImage.src;
+    birdImageRef.current = birdImg;
+    
+    // Load obstacle image for Gandhi theme
+    if (theme === 'gandi') {
+      const obstacleImg = new Image();
+      obstacleImg.src = ModiImage.src;
+      obstacleImageRef.current = obstacleImg;
+    }
+    
+    // Load sounds based on theme
+    if (theme === 'bachan') {
+      jumpAudioRef.current = new Audio('/sound/JumpAag.m4a');
+      gameOverAudioRef.current = new Audio('/sound/mkcAag.m4a');
+      introAudioRef.current = new Audio('/sound/intro.m4a');
+      introAudioRef.current.loop = true;
+    } else {
+      jumpAudioRef.current = new Audio('/sound/playGandi.m4a');
+      gameOverAudioRef.current = new Audio('/sound/khatam.m4a');
+      introAudioRef.current = new Audio('/sound/intoGandi.m4a');
+      introAudioRef.current.loop = true;
+    }
+  };
+
   const startGame = async () => {
+    if (!selectedTheme) return;
+    
     setGameStarted(true);
     setGameEnded(false);
     setShowGameOverDialog(false);
@@ -74,8 +115,8 @@ export default function FlyingBirdGame() {
     gameActiveRef.current = false;
     
     // Start intro sound when entering TAP TO START screen
+    stopAllSounds();
     if (introAudioRef.current) {
-      introAudioRef.current.currentTime = 0;
       introAudioRef.current.play().catch(e => console.log('Intro audio play failed:', e));
     }
     
@@ -105,9 +146,9 @@ export default function FlyingBirdGame() {
       cancelAnimationFrame(gameLoopRef.current);
     }
     
-    // Play game over sound
+    // Stop all sounds and play game over sound
+    stopAllSounds();
     if (gameOverAudioRef.current) {
-      gameOverAudioRef.current.currentTime = 0;
       gameOverAudioRef.current.play().catch(e => console.log('Game over audio play failed:', e));
     }
     
@@ -129,11 +170,6 @@ export default function FlyingBirdGame() {
     if (gameStarted && !showGameOverDialog) {
       if (!gameActiveRef.current) {
         gameActiveRef.current = true;
-        // Stop intro sound when user starts playing
-        if (introAudioRef.current) {
-          introAudioRef.current.pause();
-          introAudioRef.current.currentTime = 0;
-        }
       }
       birdRef.current.velocity = -6.5;
       if (jumpAudioRef.current) {
@@ -216,16 +252,26 @@ export default function FlyingBirdGame() {
         obstacle.x -= 1.3; // much slower for easier gameplay
       }
 
-      // Draw top brick
-      ctx.fillStyle = '#8B4513';
-      ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.y);
-      ctx.strokeStyle = '#654321';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(obstacle.x, 0, obstacle.width, obstacle.y);
-
-      // Draw bottom brick
-      ctx.fillRect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
-      ctx.strokeRect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
+      // Draw obstacles
+      if (selectedTheme === 'gandi' && obstacleImageRef.current && obstacleImageRef.current.complete) {
+        // Draw Modi images for Gandhi theme
+        const imgHeight = 60;
+        for (let y = 0; y < obstacle.y; y += imgHeight) {
+          ctx.drawImage(obstacleImageRef.current, obstacle.x, y, obstacle.width, Math.min(imgHeight, obstacle.y - y));
+        }
+        for (let y = obstacle.y + obstacle.height; y < canvas.height; y += imgHeight) {
+          ctx.drawImage(obstacleImageRef.current, obstacle.x, y, obstacle.width, Math.min(imgHeight, canvas.height - y));
+        }
+      } else {
+        // Draw bricks for Bachan theme
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.y);
+        ctx.strokeStyle = '#654321';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(obstacle.x, 0, obstacle.width, obstacle.y);
+        ctx.fillRect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
+        ctx.strokeRect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
+      }
 
       // Check if passed
       if (gameActiveRef.current && !obstacle.passed && obstacle.x + obstacle.width < birdX) {
@@ -292,13 +338,42 @@ export default function FlyingBirdGame() {
             
             {!gameStarted && !gameEnded && (
               <div>
-                <p className="text-gray-600 mb-4">Press SPACE or Click to fly! Avoid the obstacles!</p>
-                <button
-                  onClick={startGame}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700"
-                >
-                  Start Game (Fullscreen)
-                </button>
+                {!selectedTheme ? (
+                  <div>
+                    <p className="text-gray-600 mb-6 text-lg">Select Your Theme:</p>
+                    <div className="flex gap-4 justify-center">
+                      <button
+                        onClick={() => selectTheme('bachan')}
+                        className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 text-xl font-bold"
+                      >
+                        Bachan Theme
+                      </button>
+                      <button
+                        onClick={() => selectTheme('gandi')}
+                        className="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 text-xl font-bold"
+                      >
+                        Gandhi Theme
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-gray-600 mb-2">Theme: <span className="font-bold">{selectedTheme === 'bachan' ? 'Bachan' : 'Gandhi'}</span></p>
+                    <p className="text-gray-600 mb-4">Press SPACE or Click to fly! Avoid the obstacles!</p>
+                    <button
+                      onClick={startGame}
+                      className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 mr-3"
+                    >
+                      Start Game (Fullscreen)
+                    </button>
+                    <button
+                      onClick={() => setSelectedTheme(null)}
+                      className="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700"
+                    >
+                      Change Theme
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             
