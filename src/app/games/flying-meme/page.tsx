@@ -254,10 +254,19 @@ export default function FlyingBirdGame() {
 
       // Draw obstacles
       if (selectedTheme === 'gandi' && obstacleImageRef.current && obstacleImageRef.current.complete) {
-        // Draw single Modi image stretched for top obstacle
-        ctx.drawImage(obstacleImageRef.current, obstacle.x, 0, obstacle.width, obstacle.y);
-        // Draw single Modi image stretched for bottom obstacle
-        ctx.drawImage(obstacleImageRef.current, obstacle.x, obstacle.y + obstacle.height, obstacle.width, canvas.height - obstacle.y - obstacle.height);
+        const img = obstacleImageRef.current;
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        const imgWidth = obstacle.width;
+        const imgHeight = imgWidth / aspectRatio;
+        
+        // Draw Modi images for top obstacle
+        for (let y = 0; y < obstacle.y; y += imgHeight) {
+          ctx.drawImage(img, obstacle.x, y, imgWidth, Math.min(imgHeight, obstacle.y - y));
+        }
+        // Draw Modi images for bottom obstacle
+        for (let y = obstacle.y + obstacle.height; y < canvas.height; y += imgHeight) {
+          ctx.drawImage(img, obstacle.x, y, imgWidth, Math.min(imgHeight, canvas.height - y));
+        }
       } else {
         // Draw bricks for Bachan theme
         ctx.fillStyle = '#8B4513';
