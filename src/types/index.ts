@@ -56,3 +56,16 @@ export interface LeaderboardEntry {
   rank: number;
   lastUpdated: Timestamp;
 }
+
+export interface UserHighScores {
+  uid: string;
+  userName: string;
+  highScores: {
+    flyingMeme: number;
+    quickMath: number;
+    wordPuzzle: number;
+    reactionTime: number;
+  };
+  totalHighScore: number;
+  lastUpdated: Timestamp;
+}
