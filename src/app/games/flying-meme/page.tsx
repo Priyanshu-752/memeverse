@@ -24,7 +24,14 @@ export default function FlyingBirdGame() {
   const [gameEnded, setGameEnded] = useState(false);
   const [showGameOverDialog, setShowGameOverDialog] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [selectedTheme, setSelectedTheme] = useState<'bachan' | 'gandi' | null>(null);
+  const [selectedTheme, setSelectedTheme] = useState<'bachan' | 'gandi' | 'custom' | null>(null);
+  const [showCustomUpload, setShowCustomUpload] = useState(false);
+  const [customBirdImage, setCustomBirdImage] = useState<string | null>(null);
+  const [customSound, setCustomSound] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const obstacleImageRef = useRef<HTMLImageElement>();
   const gameLoopRef = useRef<number>();
   const birdImageRef = useRef<HTMLImageElement>();
@@ -42,7 +49,11 @@ export default function FlyingBirdGame() {
       setUser(firebaseUser);
     });
     
-    // Sounds will be loaded when theme is selected
+    // Load cached custom theme
+    const cachedImage = localStorage.getItem('customBirdImage');
+    const cachedSound = localStorage.getItem('customSound');
+    if (cachedImage) setCustomBirdImage(cachedImage);
+    if (cachedSound) setCustomSound(cachedSound);
     
     return () => {
       unsubscribe();
@@ -75,12 +86,20 @@ export default function FlyingBirdGame() {
     }
   };
 
-  const selectTheme = (theme: 'bachan' | 'gandi') => {
+  const selectTheme = (theme: 'bachan' | 'gandi' | 'custom') => {
+    if (theme === 'custom' && (!customBirdImage || !customSound)) {
+      setShowCustomUpload(true);
+      return;
+    }
     setSelectedTheme(theme);
     
     // Load bird image based on theme
     const birdImg = new Image();
-    birdImg.src = theme === 'bachan' ? BachanImage.src : GandiImage.src;
+    if (theme === 'custom') {
+      birdImg.src = customBirdImage!;
+    } else {
+      birdImg.src = theme === 'bachan' ? BachanImage.src : GandiImage.src;
+    }
     birdImageRef.current = birdImg;
     
     // Load obstacle image for Gandhi theme
@@ -91,7 +110,12 @@ export default function FlyingBirdGame() {
     }
     
     // Load sounds based on theme
-    if (theme === 'bachan') {
+    if (theme === 'custom') {
+      jumpAudioRef.current = new Audio('/sound/JumpAag.m4a');
+      gameOverAudioRef.current = new Audio(customSound!);
+      introAudioRef.current = new Audio('/sound/intro.m4a');
+      introAudioRef.current.loop = true;
+    } else if (theme === 'bachan') {
       jumpAudioRef.current = new Audio('/sound/JumpAag.m4a');
       gameOverAudioRef.current = new Audio('/sound/mkcAag.m4a');
       introAudioRef.current = new Audio('/sound/intro.m4a');
@@ -102,6 +126,94 @@ export default function FlyingBirdGame() {
       introAudioRef.current = new Audio('/sound/intoGandi.m4a');
       introAudioRef.current.loop = true;
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        setCustomBirdImage(dataUrl);
+        localStorage.setItem('customBirdImage', dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        setCustomSound(dataUrl);
+        localStorage.setItem('customSound', dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          setCustomSound(dataUrl);
+          localStorage.setItem('customSound', dataUrl);
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Recording failed:', err);
+      alert('Microphone access denied');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const playPreview = () => {
+    if (customSound) {
+      const audio = new Audio(customSound);
+      audio.play();
+    }
+  };
+
+  const confirmCustomTheme = () => {
+    if (customBirdImage && customSound) {
+      setShowCustomUpload(false);
+      setShowPreview(false);
+      selectTheme('custom');
+    }
+  };
+
+  const clearCache = () => {
+    localStorage.removeItem('customBirdImage');
+    localStorage.removeItem('customSound');
+    setCustomBirdImage(null);
+    setCustomSound(null);
+    setSelectedTheme(null);
+    setShowCustomUpload(false);
   };
 
   const startGame = async () => {
@@ -240,7 +352,7 @@ export default function FlyingBirdGame() {
       obstaclesRef.current.push({
         x: canvas.width,
         y: height,
-        width: 50,
+        width: 80,
         height: gap,
         passed: false
       });
@@ -346,7 +458,7 @@ export default function FlyingBirdGame() {
                 {!selectedTheme ? (
                   <div>
                     <p className="text-gray-600 mb-6 text-lg">Select Your Theme:</p>
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex gap-4 justify-center flex-wrap">
                       <button
                         onClick={() => selectTheme('bachan')}
                         className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 text-xl font-bold"
@@ -359,11 +471,25 @@ export default function FlyingBirdGame() {
                       >
                         Gandhi Theme
                       </button>
+                      <button
+                        onClick={() => selectTheme('custom')}
+                        className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 text-xl font-bold"
+                      >
+                        Custom Theme
+                      </button>
                     </div>
+                    {(customBirdImage || customSound) && (
+                      <button
+                        onClick={clearCache}
+                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm"
+                      >
+                        Clear Custom Cache
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div>
-                    <p className="text-gray-600 mb-2">Theme: <span className="font-bold">{selectedTheme === 'bachan' ? 'Bachan' : 'Gandhi'}</span></p>
+                    <p className="text-gray-600 mb-2">Theme: <span className="font-bold">{selectedTheme === 'bachan' ? 'Bachan' : selectedTheme === 'gandi' ? 'Gandhi' : 'Custom'}</span></p>
                     <p className="text-gray-600 mb-4">Press SPACE or Click to fly! Avoid the obstacles!</p>
                     <button
                       onClick={startGame}
@@ -379,6 +505,68 @@ export default function FlyingBirdGame() {
                     </button>
                   </div>
                 )}
+              </div>
+            )}
+
+            {showCustomUpload && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                  <h3 className="text-2xl font-bold mb-4">Custom Theme Setup</h3>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">Upload Bird Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full border rounded p-2"
+                    />
+                    {customBirdImage && <p className="text-green-600 text-sm mt-1">✓ Image uploaded</p>}
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">Sound (Game Over)</label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      onChange={handleSoundUpload}
+                      className="w-full border rounded p-2 mb-2"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        className={`flex-1 ${isRecording ? 'bg-red-600' : 'bg-blue-600'} text-white px-4 py-2 rounded hover:opacity-90`}
+                      >
+                        {isRecording ? '⏹ Stop Recording' : '🎤 Record'}
+                      </button>
+                      {customSound && (
+                        <button
+                          onClick={playPreview}
+                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        >
+                          ▶ Preview
+                        </button>
+                      )}
+                    </div>
+                    {customSound && <p className="text-green-600 text-sm mt-1">✓ Sound ready</p>}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={confirmCustomTheme}
+                      disabled={!customBirdImage || !customSound}
+                      className="flex-1 bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Confirm & Start
+                    </button>
+                    <button
+                      onClick={() => setShowCustomUpload(false)}
+                      className="flex-1 bg-gray-600 text-white px-4 py-3 rounded hover:bg-gray-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
             
