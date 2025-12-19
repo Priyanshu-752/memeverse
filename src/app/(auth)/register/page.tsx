@@ -33,7 +33,7 @@ export default function RegisterPage() {
     <PublicRoute>
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Join Memeverse</h2>
+          <h2 className="text-2xl font-bold text-center mb-6">Join memerverse</h2>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

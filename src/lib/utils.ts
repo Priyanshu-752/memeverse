@@ -1,16 +1,6 @@
-import { User } from '@/types';
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-export const calculateRating = (user: User) => {
-  return user.totalRating;
-};
-
-export const formatDate = (timestamp: any) => {
-  if (!timestamp) return 'N/A';
-  
-  try {
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString();
-  } catch (error) {
-    return 'N/A';
-  }
-};
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}

@@ -14,7 +14,7 @@ const geistMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Memeverse - Gaming Platform",
+  title: "memerverse - Gaming Platform",
   description: "Play games, compete with friends, and climb the leaderboards!",
 };
 

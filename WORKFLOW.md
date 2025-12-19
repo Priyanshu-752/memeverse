@@ -1,7 +1,7 @@
-# Memeverse Project Workflow & Roadmap
+# memerverse Project Workflow & Roadmap
 
 ## Project Overview
-Memeverse is a gaming platform where users can play games, track scores, earn ratings, and compete on leaderboards.
+memerverse is a gaming platform where users can play games, track scores, earn ratings, and compete on leaderboards.
 
 ## Tech Stack
 - **Frontend**: Next.js 14 (App Router)
