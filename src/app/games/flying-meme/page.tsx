@@ -442,38 +442,49 @@ export default function FlyingBirdGame() {
   }, [gameStarted, gameEnded, showGameOverDialog]);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Link href="/games" className="text-blue-600 hover:underline">← Back to Games</Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">Flying Meme</h1>
-        </div>
+    <div ref={containerRef} className="min-h-screen w-full relative overflow-hidden">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-black to-pink-900">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168,85,247,0.15),transparent_50%)]" />
+        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <header className="fixed top-0 w-full z-40 bg-black/30 backdrop-blur-md border-b border-white/10">
+        <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <Link href="/games" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Memerverse</Link>
+          <Link href="/games" className="text-purple-400 hover:text-pink-400 transition">← Back to Games</Link>
+        </nav>
+      </header>
+
+      <div className="relative pt-24 pb-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-white mb-8">Flying Meme 🐦</h1>
         
-        <div className="bg-white rounded-lg shadow p-8">
+        <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Score: {score}</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">Score: <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">{score}</span></h2>
             
             {!gameStarted && !gameEnded && (
               <div>
                 {!selectedTheme ? (
                   <div>
-                    <p className="text-gray-600 mb-6 text-lg">Select Your Theme:</p>
+                    <p className="text-neutral-300 mb-6 text-lg">Select Your Theme:</p>
                     <div className="flex gap-4 justify-center flex-wrap">
                       <button
                         onClick={() => selectTheme('bachan')}
-                        className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 text-xl font-bold"
+                        className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-8 py-4 rounded-xl hover:opacity-90 text-xl font-bold shadow-lg"
                       >
                         Bachan Theme
                       </button>
                       <button
                         onClick={() => selectTheme('gandi')}
-                        className="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 text-xl font-bold"
+                        className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl hover:opacity-90 text-xl font-bold shadow-lg"
                       >
                         Gandhi Theme
                       </button>
                       <button
                         onClick={() => selectTheme('custom')}
-                        className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 text-xl font-bold"
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl hover:opacity-90 text-xl font-bold shadow-lg"
                       >
                         Custom Theme
                       </button>
@@ -481,7 +492,7 @@ export default function FlyingBirdGame() {
                     {(customBirdImage || customSound) && (
                       <button
                         onClick={clearCache}
-                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm"
+                        className="mt-4 bg-red-500/80 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm border border-red-400/50"
                       >
                         Clear Custom Cache
                       </button>
@@ -489,17 +500,17 @@ export default function FlyingBirdGame() {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-gray-600 mb-2">Theme: <span className="font-bold">{selectedTheme === 'bachan' ? 'Bachan' : selectedTheme === 'gandi' ? 'Gandhi' : 'Custom'}</span></p>
-                    <p className="text-gray-600 mb-4">Press SPACE or Click to fly! Avoid the obstacles!</p>
+                    <p className="text-neutral-300 mb-2">Theme: <span className="font-bold text-white">{selectedTheme === 'bachan' ? 'Bachan' : selectedTheme === 'gandi' ? 'Gandhi' : 'Custom'}</span></p>
+                    <p className="text-neutral-300 mb-4">Press SPACE or Click to fly! Avoid the obstacles!</p>
                     <button
                       onClick={startGame}
-                      className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 mr-3"
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:opacity-90 mr-3 shadow-lg font-semibold"
                     >
                       Start Game (Fullscreen)
                     </button>
                     <button
                       onClick={() => setSelectedTheme(null)}
-                      className="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700"
+                      className="bg-white/10 border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/20"
                     >
                       Change Theme
                     </button>
@@ -509,59 +520,59 @@ export default function FlyingBirdGame() {
             )}
 
             {showCustomUpload && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-                  <h3 className="text-2xl font-bold mb-4">Custom Theme Setup</h3>
+              <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                  <h3 className="text-3xl font-bold text-white mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Custom Theme Setup</h3>
                   
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2">Upload Bird Image</label>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-neutral-300 mb-2">Upload Bird Image</label>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
-                      className="w-full border rounded p-2"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                     />
-                    {customBirdImage && <p className="text-green-600 text-sm mt-1">✓ Image uploaded</p>}
+                    {customBirdImage && <p className="text-green-400 text-sm mt-2">✓ Image uploaded</p>}
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2">Sound (Game Over)</label>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-neutral-300 mb-2">Sound (Game Over)</label>
                     <input
                       type="file"
                       accept="audio/*"
                       onChange={handleSoundUpload}
-                      className="w-full border rounded p-2 mb-2"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white mb-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={isRecording ? stopRecording : startRecording}
-                        className={`flex-1 ${isRecording ? 'bg-red-600' : 'bg-blue-600'} text-white px-4 py-2 rounded hover:opacity-90`}
+                        className={`flex-1 ${isRecording ? 'bg-red-600' : 'bg-blue-600'} text-white px-4 py-2 rounded-lg hover:opacity-90 font-semibold shadow-lg`}
                       >
                         {isRecording ? '⏹ Stop Recording' : '🎤 Record'}
                       </button>
                       {customSound && (
                         <button
                           onClick={playPreview}
-                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold shadow-lg"
                         >
                           ▶ Preview
                         </button>
                       )}
                     </div>
-                    {customSound && <p className="text-green-600 text-sm mt-1">✓ Sound ready</p>}
+                    {customSound && <p className="text-green-400 text-sm mt-2">✓ Sound ready</p>}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={confirmCustomTheme}
                       disabled={!customBirdImage || !customSound}
-                      className="flex-1 bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg"
                     >
                       Confirm & Start
                     </button>
                     <button
                       onClick={() => setShowCustomUpload(false)}
-                      className="flex-1 bg-gray-600 text-white px-4 py-3 rounded hover:bg-gray-700"
+                      className="flex-1 bg-white/10 border border-white/20 text-white px-4 py-3 rounded-xl hover:bg-white/20 font-semibold"
                     >
                       Cancel
                     </button>
@@ -625,22 +636,23 @@ export default function FlyingBirdGame() {
             
             {gameEnded && !showGameOverDialog && (
               <div>
-                <p className="text-red-600 mb-4 text-xl font-bold">Game Over! Final Score: {score}</p>
+                <p className="text-red-400 mb-4 text-xl font-bold">Game Over! Final Score: {score}</p>
                 <button
                   onClick={startGame}
-                  className="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 mr-4"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:opacity-90 mr-4 shadow-lg font-semibold"
                 >
                   Play Again
                 </button>
                 <Link
                   href="/dashboard"
-                  className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700"
+                  className="inline-block bg-white/10 border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/20"
                 >
                   Back to Dashboard
                 </Link>
               </div>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>
