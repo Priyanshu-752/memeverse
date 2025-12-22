@@ -232,13 +232,11 @@ export default function FlyingBirdGame() {
       introAudioRef.current.play().catch(e => console.log('Intro audio play failed:', e));
     }
     
-    // Enter fullscreen
-    if (containerRef.current) {
-      try {
-        await containerRef.current.requestFullscreen();
-      } catch (err) {
-        console.log('Fullscreen failed:', err);
-      }
+    // Enter fullscreen immediately
+    try {
+      await document.documentElement.requestFullscreen();
+    } catch (err) {
+      console.log('Fullscreen failed:', err);
     }
     
     // Resize canvas and reset bird position
@@ -443,26 +441,28 @@ export default function FlyingBirdGame() {
 
   return (
     <div ref={containerRef} className="min-h-screen w-full relative overflow-hidden">
-      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-black to-pink-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168,85,247,0.15),transparent_50%)]" />
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+      {!gameStarted && (
+        <>
+          <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-black to-pink-900">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168,85,247,0.15),transparent_50%)]" />
+            <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
 
-      <header className="fixed top-0 w-full z-40 bg-black/30 backdrop-blur-md border-b border-white/10">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/games" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Memerverse</Link>
-          <Link href="/games" className="text-purple-400 hover:text-pink-400 transition">← Back to Games</Link>
-        </nav>
-      </header>
+          <header className="fixed top-0 w-full z-40 bg-black/30 backdrop-blur-md border-b border-white/10">
+            <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+              <Link href="/games" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Memerverse</Link>
+              <Link href="/games" className="text-purple-400 hover:text-pink-400 transition">← Back to Games</Link>
+            </nav>
+          </header>
 
-      <div className="relative pt-24 pb-12 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-8">Flying Meme 🐦</h1>
+          <div className="relative pt-24 pb-12 px-6">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-4xl font-bold text-white mb-8">Flying Meme 🐦</h1>
         
-        <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-6">Score: <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">{score}</span></h2>
+              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl p-8">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-white mb-6">Score: <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">{score}</span></h2>
             
             {!gameStarted && !gameEnded && (
               <div>
@@ -581,80 +581,82 @@ export default function FlyingBirdGame() {
               </div>
             )}
             
-            {gameStarted && (
-              <div className="fixed inset-0 bg-black z-50">
-                <canvas
-                  ref={canvasRef}
-                  onClick={jump}
-                  className="w-full h-full cursor-pointer"
-                />
-                {showGameOverDialog && !gameEnded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
-                    <div className="bg-white rounded-2xl p-12 text-center max-w-md mx-4 shadow-2xl">
-                      <h2 className="text-5xl font-bold text-red-600 mb-4">KHATAM!</h2>
-                      <p className="text-3xl font-bold text-gray-800 mb-2">Tata Bye Bye</p>
-                      <p className="text-2xl text-gray-600 mb-6">Gaya! 😢</p>
-                      <div className="bg-blue-100 rounded-lg p-4 mb-6">
-                        <p className="text-lg text-gray-700 mb-1">Your Score</p>
-                        <p className="text-6xl font-bold text-blue-600">{score}</p>
-                      </div>
+                  {gameEnded && !showGameOverDialog && (
+                    <div>
+                      <p className="text-red-400 mb-4 text-xl font-bold">Game Over! Final Score: {score}</p>
                       <button
                         onClick={startGame}
-                        className="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 text-xl font-bold w-full mb-3"
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:opacity-90 mr-4 shadow-lg font-semibold"
                       >
                         Play Again
                       </button>
-                      <button
-                        onClick={() => {
-                          setShowGameOverDialog(false);
-                          setGameEnded(true);
-                          setGameStarted(false);
-                          if (document.fullscreenElement) {
-                            document.exitFullscreen();
-                          }
-                          // Stop all sounds when exiting
-                          if (introAudioRef.current) {
-                            introAudioRef.current.pause();
-                            introAudioRef.current.currentTime = 0;
-                          }
-                          if (jumpAudioRef.current) {
-                            jumpAudioRef.current.pause();
-                          }
-                          if (gameOverAudioRef.current) {
-                            gameOverAudioRef.current.pause();
-                          }
-                        }}
-                        className="bg-gray-600 text-white px-8 py-4 rounded-lg hover:bg-gray-700 text-xl font-bold w-full"
+                      <Link
+                        href="/dashboard"
+                        className="inline-block bg-white/10 border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/20"
                       >
-                        Exit
-                      </button>
+                        Back to Dashboard
+                      </Link>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            )}
-            
-            {gameEnded && !showGameOverDialog && (
-              <div>
-                <p className="text-red-400 mb-4 text-xl font-bold">Game Over! Final Score: {score}</p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {gameStarted && (
+        <div className="fixed inset-0 bg-black z-[9999]">
+          <canvas
+            ref={canvasRef}
+            onClick={jump}
+            className="w-full h-full cursor-pointer"
+          />
+          {showGameOverDialog && !gameEnded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
+              <div className="bg-white rounded-2xl p-12 text-center max-w-md mx-4 shadow-2xl">
+                <h2 className="text-5xl font-bold text-red-600 mb-4">KHATAM!</h2>
+                <p className="text-3xl font-bold text-gray-800 mb-2">Tata Bye Bye</p>
+                <p className="text-2xl text-gray-600 mb-6">Gaya! 😢</p>
+                <div className="bg-blue-100 rounded-lg p-4 mb-6">
+                  <p className="text-lg text-gray-700 mb-1">Your Score</p>
+                  <p className="text-6xl font-bold text-blue-600">{score}</p>
+                </div>
                 <button
                   onClick={startGame}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:opacity-90 mr-4 shadow-lg font-semibold"
+                  className="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 text-xl font-bold w-full mb-3"
                 >
                   Play Again
                 </button>
-                <Link
-                  href="/dashboard"
-                  className="inline-block bg-white/10 border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/20"
+                <button
+                  onClick={() => {
+                    setShowGameOverDialog(false);
+                    setGameEnded(true);
+                    setGameStarted(false);
+                    if (document.fullscreenElement) {
+                      document.exitFullscreen();
+                    }
+                    // Stop all sounds when exiting
+                    if (introAudioRef.current) {
+                      introAudioRef.current.pause();
+                      introAudioRef.current.currentTime = 0;
+                    }
+                    if (jumpAudioRef.current) {
+                      jumpAudioRef.current.pause();
+                    }
+                    if (gameOverAudioRef.current) {
+                      gameOverAudioRef.current.pause();
+                    }
+                  }}
+                  className="bg-gray-600 text-white px-8 py-4 rounded-lg hover:bg-gray-700 text-xl font-bold w-full"
                 >
-                  Back to Dashboard
-                </Link>
+                  Exit
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
