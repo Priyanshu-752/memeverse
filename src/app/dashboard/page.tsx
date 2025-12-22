@@ -35,10 +35,10 @@ export default function DashboardPage() {
   }
 
   const games = [
-    { id: 'flying-meme', name: 'Flying Meme', emoji: '🐦', description: 'Fly through obstacles', key: 'flyingMeme' as const },
-    { id: 'quick-math', name: 'Quick Math', emoji: '🧮', description: 'Solve math problems fast', key: 'quickMath' as const },
-    { id: 'word-puzzle', name: 'Word Puzzle', emoji: '🔤', description: 'Unscramble the words', key: 'wordPuzzle' as const },
-    { id: 'reaction-time', name: 'Reaction Time', emoji: '⚡', description: 'Test your reflexes', key: 'reactionTime' as const }
+    { id: 'flying-meme', name: 'Flying Meme', emoji: '🐦', description: 'Fly through obstacles', key: 'flyingMeme' as const, available: true },
+    { id: 'quick-math', name: 'Quick Math', emoji: '🧮', description: 'Solve math problems fast', key: 'quickMath' as const, available: false },
+    { id: 'word-puzzle', name: 'Word Puzzle', emoji: '🔤', description: 'Unscramble the words', key: 'wordPuzzle' as const, available: false },
+    { id: 'reaction-time', name: 'Reaction Time', emoji: '⚡', description: 'Test your reflexes', key: 'reactionTime' as const, available: false }
   ];
 
   return (
@@ -112,20 +112,31 @@ export default function DashboardPage() {
                     transition={{ delay: 0.5 + idx * 0.1 }}
                     className="relative"
                   >
-                    <Link href={`/games/${game.id}`}>
-                      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 hover:border-purple-500/50 hover:scale-105 transition-all group cursor-pointer">
-                        <Meteors number={10} />
+                    {game.available ? (
+                      <Link href={`/games/${game.id}`}>
+                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 hover:border-purple-500/50 hover:scale-105 transition-all group cursor-pointer">
+                          <Meteors number={10} />
+                          <div className="relative z-10">
+                            <div className="text-5xl mb-4">{game.emoji}</div>
+                            <h4 className="text-xl font-bold text-white mb-2">{game.name}</h4>
+                            <p className="text-neutral-300 mb-2">{game.description}</p>
+                            <p className="text-sm text-neutral-400 mb-4">
+                              Best: {highScores?.highScores[game.key] ?? user.gameScores[game.key]}
+                            </p>
+                            <span className="text-purple-400 font-semibold group-hover:text-pink-400 transition">Play Now →</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 opacity-60 cursor-not-allowed">
                         <div className="relative z-10">
                           <div className="text-5xl mb-4">{game.emoji}</div>
                           <h4 className="text-xl font-bold text-white mb-2">{game.name}</h4>
                           <p className="text-neutral-300 mb-2">{game.description}</p>
-                          <p className="text-sm text-neutral-400 mb-4">
-                            Best: {highScores?.highScores[game.key] ?? user.gameScores[game.key]}
-                          </p>
-                          <span className="text-purple-400 font-semibold group-hover:text-pink-400 transition">Play Now →</span>
+                          <span className="inline-block px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full text-sm text-purple-300 font-semibold">Coming Soon</span>
                         </div>
                       </div>
-                    </Link>
+                    )}
                   </motion.div>
                 ))}
               </div>

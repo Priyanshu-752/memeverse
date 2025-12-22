@@ -6,10 +6,10 @@ import { Meteors } from '@/components/ui/meteors';
 
 export default function GamesPage() {
   const games = [
-    { id: 'flying-meme', name: 'Flying Meme', emoji: '🐦', description: 'Test your flying skills', status: 'Live' },
-    { id: 'quick-math', name: 'Quick Math', emoji: '🧮', description: 'Solve math problems fast', status: 'Live' },
-    { id: 'word-puzzle', name: 'Word Puzzle', emoji: '🔤', description: 'Unscramble the words', status: 'Live' },
-    { id: 'reaction-time', name: 'Reaction Time', emoji: '⚡', description: 'Test your reflexes', status: 'Live' }
+    { id: 'flying-meme', name: 'Flying Meme', emoji: '🐦', description: 'Test your flying skills', available: true },
+    { id: 'quick-math', name: 'Quick Math', emoji: '🧮', description: 'Solve math problems fast', available: false },
+    { id: 'word-puzzle', name: 'Word Puzzle', emoji: '🔤', description: 'Unscramble the words', available: false },
+    { id: 'reaction-time', name: 'Reaction Time', emoji: '⚡', description: 'Test your reflexes', available: false }
   ];
 
   return (
@@ -52,26 +52,31 @@ export default function GamesPage() {
                 transition={{ delay: idx * 0.1 }}
                 className="relative"
               >
-                <Link href={`/games/${game.id}`}>
-                  <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 hover:border-purple-500/50 hover:scale-105 transition-all group cursor-pointer">
-                    <Meteors number={15} />
+                {game.available ? (
+                  <Link href={`/games/${game.id}`}>
+                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 hover:border-purple-500/50 hover:scale-105 transition-all group cursor-pointer">
+                      <Meteors number={15} />
+                      <div className="relative z-10">
+                        <div className="text-6xl mb-4">{game.emoji}</div>
+                        <h2 className="text-2xl font-bold text-white mb-2">{game.name}</h2>
+                        <p className="text-neutral-300 mb-4">{game.description}</p>
+                        <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-500/20 text-green-400 border border-green-500/50">Live</span>
+                        <div className="mt-4">
+                          <span className="text-purple-400 font-semibold group-hover:text-pink-400 transition">Play Now →</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 opacity-60 cursor-not-allowed">
                     <div className="relative z-10">
                       <div className="text-6xl mb-4">{game.emoji}</div>
                       <h2 className="text-2xl font-bold text-white mb-2">{game.name}</h2>
                       <p className="text-neutral-300 mb-4">{game.description}</p>
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                        game.status === 'Live' 
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                          : 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
-                      }`}>
-                        {game.status}
-                      </span>
-                      <div className="mt-4">
-                        <span className="text-purple-400 font-semibold group-hover:text-pink-400 transition">Play Now →</span>
-                      </div>
+                      <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">Coming Soon</span>
                     </div>
                   </div>
-                </Link>
+                )}
               </motion.div>
             ))}
           </div>
